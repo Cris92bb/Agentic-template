@@ -18,10 +18,11 @@ $$\text{app} \succ \text{pages} \succ \text{widgets} \succ \text{features} \succ
 ## 2. Multi-Platform & Form-Factor Compatibility
 
 When building or updating UI:
-- **Wearable (Smartwatch / Wear OS)**: Test shortest side $\le 320.0$, circular screen safe padding (`WearableUtils.getSafeCircularPadding`), glanceable cards, high contrast.
+- **Wearable (Smartwatch / Wear OS)**: Both sides $\le 320.0$, circular screen safe padding (`WearableUtils.getSafeCircularPadding`), glanceable cards, high contrast.
 - **Smartphone**: Portrait single-pane layout, touch targets $\ge 44 \times 44$, safe area insets.
-- **Foldable**: Dual-pane master-detail or wide deck view reacting smoothly when unfolded ($600 \le \text{width} < 1024$).
-- **Desktop & Web**: Responsive navigation rail, desktop keyboard shortcuts, mouse hover states, window controls.
+- **Foldable**: Dual-pane master-detail or wide deck view reacting smoothly when unfolded ($600 \le \text{width} < 1024$), split along reported hinges.
+- **Desktop & Web**: Responsive navigation rail, keyboard shortcuts (Ctrl/⌘ + 1–3), mouse hover states, window controls (`WindowControlService` on Linux).
+- **Colors**: Read colors from `AppPalette.of(context)`; never branch on `isDark` in widgets (see `.agents/rules/design-system.md`).
 
 ## 3. Mandatory Git Commits for Impactful Changes
 

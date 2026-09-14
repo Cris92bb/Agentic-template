@@ -44,10 +44,40 @@ class AppTokens {
   static const Color primaryLight = Color(0xFF4A6553);
   static const Color secondary = Color(0xFFDDE6D7);
 
+  /// Secondary container for dark mode, distinct from the dark surfaces.
+  static const Color darkSecondary = Color(0xFF34473B);
+
+  /// Sage accent for icons and highlights on dark surfaces (≥ 4.5:1 contrast).
+  static const Color darkAccent = Color(0xFF8DB09A);
+
   static const Color accentSuccess = Color(0xFF2E7D32);
   static const Color accentWarning = Color(0xFFD97706);
   static const Color accentError = Color(0xFFDC2626);
   static const Color accentInfo = Color(0xFF2563EB);
+
+  // ---------------------------------------------------------------------------
+  // Status Foregrounds (badge text & icons readable on tinted fills)
+  // ---------------------------------------------------------------------------
+  static const Color lightWarningFg = Color(0xFFB45309);
+  static const Color darkSuccessFg = Color(0xFF81C784);
+  static const Color darkWarningFg = Color(0xFFFFB74D);
+  static const Color darkErrorFg = Color(0xFFE57373);
+  static const Color darkInfoFg = Color(0xFF64B5F6);
+
+  // ---------------------------------------------------------------------------
+  // High Contrast Overrides
+  // ---------------------------------------------------------------------------
+  static const Color lightHcTextSecondary = Color(0xFF2F3B33);
+  static const Color lightHcBorder = Color(0xFF5A695F);
+  static const Color darkHcTextSecondary = Color(0xFFD5E0D8);
+  static const Color darkHcBorder = Color(0xFFA2B3A7);
+  static const Color darkHcAccent = Color(0xFFB5D3BF);
+
+  // ---------------------------------------------------------------------------
+  // Device Simulator
+  // ---------------------------------------------------------------------------
+  static const Color lightDeviceBezel = Color(0xFF1E293B);
+  static const Color darkDeviceBezel = Color(0xFF334155);
 
   // ---------------------------------------------------------------------------
   // Spacing Scale

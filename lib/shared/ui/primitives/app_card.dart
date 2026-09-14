@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_palette.dart';
 import '../tokens.dart';
 
 /// Reusable surface container applying token colors, borders, and ambient shadows.
@@ -26,16 +27,11 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
-    final bg = backgroundColor ??
-        (isDark ? AppTokens.darkCardBg : AppTokens.lightCardBg);
-    final borderCol =
-        borderColor ?? (isDark ? AppTokens.darkBorder : AppTokens.lightBorder);
+    final bg = backgroundColor ?? palette.card;
+    final borderCol = borderColor ?? palette.border;
     final radius = borderRadius ?? AppTokens.radiusLg;
-    final shadows =
-        isDark ? AppTokens.darkCardShadow : AppTokens.lightCardShadow;
 
     final content = Container(
       width: width,
@@ -45,7 +41,7 @@ class AppCard extends StatelessWidget {
         color: bg,
         borderRadius: radius,
         border: Border.all(color: borderCol, width: 1.0),
-        boxShadow: shadows,
+        boxShadow: palette.cardShadow,
       ),
       child: child,
     );

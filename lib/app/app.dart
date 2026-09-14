@@ -7,25 +7,17 @@ import 'theme/app_scroll_behavior.dart';
 import 'theme/app_theme.dart';
 
 /// Root application widget for Agentic Template.
-class AgenticApp extends StatelessWidget {
+///
+/// Must be placed under a [ProviderScope]; `main.dart` creates it together with
+/// the persistent storage override.
+class AgenticApp extends ConsumerStatefulWidget {
   const AgenticApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const ProviderScope(
-      child: _AgenticAppContent(),
-    );
-  }
+  ConsumerState<AgenticApp> createState() => _AgenticAppState();
 }
 
-class _AgenticAppContent extends ConsumerStatefulWidget {
-  const _AgenticAppContent();
-
-  @override
-  ConsumerState<_AgenticAppContent> createState() => _AgenticAppContentState();
-}
-
-class _AgenticAppContentState extends ConsumerState<_AgenticAppContent>
+class _AgenticAppState extends ConsumerState<AgenticApp>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -67,6 +59,7 @@ class _AgenticAppContentState extends ConsumerState<_AgenticAppContent>
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
+    final highContrast = ref.watch(highContrastProvider);
 
     ref.listen<ThemeMode>(themeModeProvider, (_, next) {
       _syncTheme(next);
@@ -76,8 +69,13 @@ class _AgenticAppContentState extends ConsumerState<_AgenticAppContent>
       title: 'Agentic Template',
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AppScrollBehavior(),
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme:
+          highContrast ? AppTheme.highContrastLightTheme : AppTheme.lightTheme,
+      darkTheme:
+          highContrast ? AppTheme.highContrastDarkTheme : AppTheme.darkTheme,
+      // Used when the platform itself requests high contrast.
+      highContrastTheme: AppTheme.highContrastLightTheme,
+      highContrastDarkTheme: AppTheme.highContrastDarkTheme,
       themeMode: themeMode,
       home: const HomePage(),
     );

@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/shared.dart';
 import '../state/counter_controller.dart';
 
 /// Clean feature card showcasing atomic interaction and state dispatch.
-class ActionTriggerCard extends ConsumerWidget {
+class ActionTriggerCard extends ConsumerStatefulWidget {
   final bool compact;
 
   const ActionTriggerCard({
@@ -13,18 +15,36 @@ class ActionTriggerCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ActionTriggerCard> createState() => _ActionTriggerCardState();
+}
+
+class _ActionTriggerCardState extends ConsumerState<ActionTriggerCard> {
+  // Rebuilds periodically so the relative "Updated ..." label stays accurate
+  // even when the counter does not change.
+  late final Timer _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final counterState = ref.watch(counterProvider);
     final controller = ref.read(counterProvider.notifier);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
+    final canDecrement = counterState.count > 0;
 
-    final textPrimary =
-        isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary;
-    final textSecondary =
-        isDark ? AppTokens.darkTextSecondary : AppTokens.lightTextSecondary;
-
-    if (compact) {
+    if (widget.compact) {
       return AppCard(
         padding: const EdgeInsets.all(AppTokens.spaceSm),
         child: Column(
@@ -35,7 +55,7 @@ class ActionTriggerCard extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
-                color: textPrimary,
+                color: palette.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -45,12 +65,12 @@ class ActionTriggerCard extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.remove_circle_outline_rounded),
                   iconSize: 24,
-                  onPressed: controller.decrement,
+                  onPressed: canDecrement ? controller.decrement : null,
                 ),
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline_rounded),
                   iconSize: 24,
-                  color: AppTokens.primaryLight,
+                  color: palette.accent,
                   onPressed: controller.increment,
                 ),
               ],
@@ -66,22 +86,23 @@ class ActionTriggerCard extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Sample Action Slice',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: textPrimary,
-                  letterSpacing: -0.3,
+              Expanded(
+                child: Text(
+                  'Sample Action Slice',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: palette.textPrimary,
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ),
+              const SizedBox(width: AppTokens.spaceSm),
               StatusBadge(
                 label: 'Count: ${counterState.count}',
-                tone: counterState.count > 0
-                    ? BadgeTone.success
-                    : BadgeTone.neutral,
+                tone: canDecrement ? BadgeTone.success : BadgeTone.neutral,
                 icon: Icons.check_circle_outline,
               ),
             ],
@@ -91,26 +112,28 @@ class ActionTriggerCard extends ConsumerWidget {
             'This feature demonstrates a clean, encapsulated action slice with local riverpod state. Updated ${DateHelpers.timeAgo(counterState.lastUpdated)}.',
             style: TextStyle(
               fontSize: 13,
-              color: textSecondary,
+              color: palette.textSecondary,
               height: 1.4,
             ),
           ),
           const SizedBox(height: AppTokens.spaceMd),
-          Row(
+          // Wrap instead of Row so the buttons flow onto a new line on narrow
+          // cards (phone, fold detail pane) instead of overflowing.
+          Wrap(
+            spacing: AppTokens.spaceSm,
+            runSpacing: AppTokens.spaceSm,
             children: [
               AppButton(
                 label: 'Increment',
                 icon: Icons.add_rounded,
                 onPressed: controller.increment,
               ),
-              const SizedBox(width: AppTokens.spaceSm),
               AppButton.secondary(
                 label: 'Decrement',
                 icon: Icons.remove_rounded,
-                onPressed: counterState.count > 0 ? controller.decrement : null,
+                onPressed: canDecrement ? controller.decrement : null,
               ),
-              const Spacer(),
-              if (counterState.count > 0)
+              if (canDecrement)
                 AppButton.ghost(
                   label: 'Reset',
                   icon: Icons.refresh_rounded,

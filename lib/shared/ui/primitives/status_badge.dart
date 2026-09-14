@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_palette.dart';
 import '../tokens.dart';
 
 enum BadgeTone { primary, success, warning, error, info, neutral }
@@ -18,45 +19,47 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
+    final tintAlpha =
+        Theme.of(context).brightness == Brightness.dark ? 0.25 : 0.12;
 
-    Color bg;
-    Color fg;
-    Color border;
+    Color tint(Color color) => color.withValues(alpha: tintAlpha);
+    Color outline(Color color) => color.withValues(alpha: 0.3);
 
-    switch (tone) {
-      case BadgeTone.primary:
-        bg = AppTokens.primary.withValues(alpha: isDark ? 0.25 : 0.12);
-        fg = isDark ? AppTokens.darkTextPrimary : AppTokens.primary;
-        border = AppTokens.primary.withValues(alpha: 0.3);
-        break;
-      case BadgeTone.success:
-        bg = AppTokens.accentSuccess.withValues(alpha: isDark ? 0.25 : 0.12);
-        fg = isDark ? const Color(0xFF81C784) : AppTokens.accentSuccess;
-        border = AppTokens.accentSuccess.withValues(alpha: 0.3);
-        break;
-      case BadgeTone.warning:
-        bg = AppTokens.accentWarning.withValues(alpha: isDark ? 0.25 : 0.12);
-        fg = isDark ? const Color(0xFFFFB74D) : AppTokens.accentWarning;
-        border = AppTokens.accentWarning.withValues(alpha: 0.3);
-        break;
-      case BadgeTone.error:
-        bg = AppTokens.accentError.withValues(alpha: isDark ? 0.25 : 0.12);
-        fg = isDark ? const Color(0xFFE57373) : AppTokens.accentError;
-        border = AppTokens.accentError.withValues(alpha: 0.3);
-        break;
-      case BadgeTone.info:
-        bg = AppTokens.accentInfo.withValues(alpha: isDark ? 0.25 : 0.12);
-        fg = isDark ? const Color(0xFF64B5F6) : AppTokens.accentInfo;
-        border = AppTokens.accentInfo.withValues(alpha: 0.3);
-        break;
-      case BadgeTone.neutral:
-        bg = isDark ? AppTokens.darkSurfaceBg : AppTokens.lightSurfaceBg;
-        fg = isDark ? AppTokens.darkTextSecondary : AppTokens.lightTextSecondary;
-        border = isDark ? AppTokens.darkBorder : AppTokens.lightBorder;
-        break;
-    }
+    final (Color bg, Color fg, Color border) = switch (tone) {
+      BadgeTone.primary => (
+          tint(AppTokens.primary),
+          Theme.of(context).brightness == Brightness.dark
+              ? palette.textPrimary
+              : AppTokens.primary,
+          outline(AppTokens.primary),
+        ),
+      BadgeTone.success => (
+          tint(AppTokens.accentSuccess),
+          palette.successFg,
+          outline(AppTokens.accentSuccess),
+        ),
+      BadgeTone.warning => (
+          tint(AppTokens.accentWarning),
+          palette.warningFg,
+          outline(AppTokens.accentWarning),
+        ),
+      BadgeTone.error => (
+          tint(AppTokens.accentError),
+          palette.errorFg,
+          outline(AppTokens.accentError),
+        ),
+      BadgeTone.info => (
+          tint(AppTokens.accentInfo),
+          palette.infoFg,
+          outline(AppTokens.accentInfo),
+        ),
+      BadgeTone.neutral => (
+          palette.surface,
+          palette.textSecondary,
+          palette.border,
+        ),
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -65,24 +68,30 @@ class StatusBadge extends StatelessWidget {
         borderRadius: AppTokens.radiusFull,
         border: Border.all(color: border, width: 1.0),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: fg),
-            const SizedBox(width: 4),
+      // A single rich text (instead of a Row) truncates with an ellipsis when
+      // the badge is width-constrained, yet still sizes naturally inside Rows.
+      child: Text.rich(
+        TextSpan(
+          children: [
+            if (icon != null)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(icon, size: 12, color: fg),
+                ),
+              ),
+            TextSpan(text: label),
           ],
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: fg,
-              letterSpacing: -0.1,
-            ),
-          ),
-        ],
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: fg,
+          letterSpacing: -0.1,
+        ),
       ),
     );
   }

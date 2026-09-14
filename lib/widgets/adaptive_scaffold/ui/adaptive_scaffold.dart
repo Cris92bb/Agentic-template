@@ -48,31 +48,21 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   Widget build(BuildContext context) {
     final tier = Breakpoints.getTier(context);
     final isCompact = tier == ScreenTier.compact || tier == ScreenTier.wearable;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final textPrimary =
-        isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary;
-    final canvasBg =
-        isDark ? AppTokens.darkCanvasBg : AppTokens.lightCanvasBg;
-    final surfaceBg =
-        isDark ? AppTokens.darkSurfaceBg : AppTokens.lightSurfaceBg;
-    final borderCol =
-        isDark ? AppTokens.darkBorder : AppTokens.lightBorder;
+    final palette = AppPalette.of(context);
 
     // Compact layout (Phone / Fold-folded)
     if (isCompact) {
       return Scaffold(
-        backgroundColor: canvasBg,
+        backgroundColor: palette.canvas,
         appBar: AppBar(
-          backgroundColor: surfaceBg,
+          backgroundColor: palette.surface,
           elevation: 0,
           title: Text(
             widget.title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: textPrimary,
+              color: palette.textPrimary,
               letterSpacing: -0.5,
             ),
           ),
@@ -89,10 +79,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
             ? NavigationBar(
                 selectedIndex: widget.selectedIndex,
                 onDestinationSelected: widget.onDestinationSelected,
-                backgroundColor: surfaceBg,
-                indicatorColor: isDark
-                    ? AppTokens.darkActionBg
-                    : AppTokens.secondary,
+                backgroundColor: palette.surface,
+                indicatorColor: palette.navIndicator,
                 destinations: widget.destinations.map((d) {
                   return NavigationDestination(
                     icon: Icon(d.icon, size: 20),
@@ -108,16 +96,16 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
 
     // Wide layout (Foldable unfolded, Tablet, Desktop, Web)
     return Scaffold(
-      backgroundColor: canvasBg,
+      backgroundColor: palette.canvas,
       body: Row(
         children: [
           // Navigation Rail
           if (widget.destinations.length > 1)
             Container(
               decoration: BoxDecoration(
-                color: surfaceBg,
+                color: palette.surface,
                 border: Border(
-                  right: BorderSide(color: borderCol, width: 1.0),
+                  right: BorderSide(color: palette.border, width: 1.0),
                 ),
               ),
               child: NavigationRail(
@@ -125,17 +113,15 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
                 onDestinationSelected: widget.onDestinationSelected,
                 backgroundColor: Colors.transparent,
                 labelType: NavigationRailLabelType.all,
-                indicatorColor: isDark
-                    ? AppTokens.darkActionBg
-                    : AppTokens.secondary,
+                indicatorColor: palette.navIndicator,
                 leading: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppTokens.spaceMd),
                   child: Text(
                     widget.title.isNotEmpty ? widget.title[0] : 'A',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      color: AppTokens.primaryLight,
+                      color: palette.accent,
                     ),
                   ),
                 ),
@@ -163,37 +149,51 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
                     horizontal: AppTokens.spaceLg,
                   ),
                   decoration: BoxDecoration(
-                    color: surfaceBg,
+                    color: palette.surface,
                     border: Border(
-                      bottom: BorderSide(color: borderCol, width: 1.0),
+                      bottom: BorderSide(color: palette.border, width: 1.0),
                     ),
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: textPrimary,
-                          letterSpacing: -0.5,
+                      // Bounded so a long title truncates instead of squeezing
+                      // the header controls.
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 240),
+                        child: Text(
+                          widget.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: palette.textPrimary,
+                            letterSpacing: -0.5,
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      Flexible(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const DeviceSimulatorPicker(),
-                              const SizedBox(width: AppTokens.spaceSm),
-                              const ThemeToggleButton(),
-                              if (widget.actions != null) ...[
+                      const SizedBox(width: AppTokens.spaceMd),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // The chip row needs desktop width; foldables
+                                // and tablets use the popup picker.
+                                DeviceSimulatorPicker(
+                                  compact: tier != ScreenTier.desktopWeb,
+                                ),
                                 const SizedBox(width: AppTokens.spaceSm),
-                                ...widget.actions!,
+                                const ThemeToggleButton(),
+                                if (widget.actions != null) ...[
+                                  const SizedBox(width: AppTokens.spaceSm),
+                                  ...widget.actions!,
+                                ],
                               ],
-                            ],
+                            ),
                           ),
                         ),
                       ),

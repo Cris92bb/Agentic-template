@@ -1,12 +1,12 @@
 {
-    "name": "agentic_template",
-    "short_name": "agentic_template",
+    "name": "Agentic Template",
+    "short_name": "Agentic",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F4F6F0",
+    "theme_color": "#2A3C31",
+    "description": "Flutter template with Feature-Sliced Design and adaptive wearable, phone, foldable and desktop layouts.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

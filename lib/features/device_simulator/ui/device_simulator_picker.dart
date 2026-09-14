@@ -16,8 +16,7 @@ class DeviceSimulatorPicker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTier = ref.watch(simulatedTierProvider);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
     final currentDevice = SimulatedDevice.values.firstWhere(
       (d) => d.targetTier == activeTier,
@@ -31,7 +30,7 @@ class DeviceSimulatorPicker extends ConsumerWidget {
         icon: Icon(
           currentDevice.icon,
           size: 18,
-          color: isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary,
+          color: palette.textPrimary,
         ),
         onSelected: (device) {
           ref
@@ -47,11 +46,7 @@ class DeviceSimulatorPicker extends ConsumerWidget {
                 Icon(
                   device.icon,
                   size: 18,
-                  color: isSelected
-                      ? AppTokens.primaryLight
-                      : (isDark
-                          ? AppTokens.darkTextSecondary
-                          : AppTokens.lightTextSecondary),
+                  color: isSelected ? palette.accent : palette.textSecondary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -90,20 +85,10 @@ class DeviceSimulatorPicker extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? (isDark
-                          ? AppTokens.darkActionBg
-                          : AppTokens.lightActionBg)
-                      : (isDark
-                          ? AppTokens.darkSurfaceBg
-                          : AppTokens.lightSurfaceBg),
+                  color: isSelected ? palette.actionBg : palette.surface,
                   borderRadius: AppTokens.radiusFull,
                   border: Border.all(
-                    color: isSelected
-                        ? (isDark ? AppTokens.primaryLight : AppTokens.primary)
-                        : (isDark
-                            ? AppTokens.darkBorder
-                            : AppTokens.lightBorder),
+                    color: isSelected ? palette.accent : palette.border,
                     width: 1.0,
                   ),
                 ),
@@ -113,11 +98,8 @@ class DeviceSimulatorPicker extends ConsumerWidget {
                     Icon(
                       device.icon,
                       size: 14,
-                      color: isSelected
-                          ? Colors.white
-                          : (isDark
-                              ? AppTokens.darkTextSecondary
-                              : AppTokens.lightTextSecondary),
+                      color:
+                          isSelected ? palette.actionFg : palette.textSecondary,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -126,11 +108,8 @@ class DeviceSimulatorPicker extends ConsumerWidget {
                         fontSize: 12,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white
-                            : (isDark
-                                ? AppTokens.darkTextPrimary
-                                : AppTokens.lightTextPrimary),
+                        color:
+                            isSelected ? palette.actionFg : palette.textPrimary,
                       ),
                     ),
                   ],

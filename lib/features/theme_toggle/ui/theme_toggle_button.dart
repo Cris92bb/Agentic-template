@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../entities/app_settings/app_settings.dart';
 import '../../../shared/shared.dart';
 
-/// Interactive button to toggle or select theme mode.
+/// Interactive button to cycle or select the theme mode.
+///
+/// The round button cycles System → Light → Dark; with [showMenu] it opens a
+/// menu listing the three modes instead.
 class ThemeToggleButton extends ConsumerWidget {
   final bool showMenu;
 
@@ -12,84 +15,88 @@ class ThemeToggleButton extends ConsumerWidget {
     this.showMenu = false,
   });
 
+  /// Mode selected by the next tap on the round button.
+  static ThemeMode nextMode(ThemeMode mode) => switch (mode) {
+        ThemeMode.system => ThemeMode.light,
+        ThemeMode.light => ThemeMode.dark,
+        ThemeMode.dark => ThemeMode.system,
+      };
+
+  static IconData _iconFor(ThemeMode mode) => switch (mode) {
+        ThemeMode.system => Icons.brightness_auto_rounded,
+        ThemeMode.light => Icons.wb_sunny_outlined,
+        ThemeMode.dark => Icons.nightlight_round,
+      };
+
+  static String _labelFor(ThemeMode mode) => switch (mode) {
+        ThemeMode.system => 'System Default',
+        ThemeMode.light => 'Light Mode',
+        ThemeMode.dark => 'Dark Mode',
+      };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
     if (showMenu) {
       return PopupMenuButton<ThemeMode>(
         tooltip: 'Select Theme',
         initialValue: themeMode,
         icon: Icon(
-          isDark ? Icons.nightlight_round : Icons.wb_sunny_outlined,
+          _iconFor(themeMode),
           size: 18,
-          color: isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary,
+          color: palette.textPrimary,
         ),
         onSelected: (mode) {
           ref.read(appSettingsProvider.notifier).setThemeMode(mode);
         },
-        itemBuilder: (context) => const [
-          PopupMenuItem(
-            value: ThemeMode.system,
-            child: Row(
-              children: [
-                Icon(Icons.brightness_auto_rounded, size: 18),
-                SizedBox(width: 8),
-                Text('System Default'),
-              ],
+        itemBuilder: (context) => [
+          for (final mode in ThemeMode.values)
+            PopupMenuItem(
+              value: mode,
+              child: Row(
+                children: [
+                  Icon(_iconFor(mode), size: 18),
+                  const SizedBox(width: 8),
+                  Text(_labelFor(mode)),
+                ],
+              ),
             ),
-          ),
-          PopupMenuItem(
-            value: ThemeMode.light,
-            child: Row(
-              children: [
-                Icon(Icons.wb_sunny_outlined, size: 18),
-                SizedBox(width: 8),
-                Text('Light Mode'),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: ThemeMode.dark,
-            child: Row(
-              children: [
-                Icon(Icons.nightlight_round, size: 18),
-                SizedBox(width: 8),
-                Text('Dark Mode'),
-              ],
-            ),
-          ),
         ],
       );
     }
 
-    return Semantics(
-      button: true,
-      label: 'Toggle theme mode',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: AppTokens.radiusFull,
-          onTap: () {
-            final next = isDark ? ThemeMode.light : ThemeMode.dark;
-            ref.read(appSettingsProvider.notifier).setThemeMode(next);
-          },
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isDark ? AppTokens.darkSurfaceBg : AppTokens.lightSurfaceBg,
-              border: Border.all(
-                color: isDark ? AppTokens.darkBorder : AppTokens.lightBorder,
-                width: 1.0,
+    final next = nextMode(themeMode);
+
+    return Tooltip(
+      message: 'Theme: ${_labelFor(themeMode)}',
+      child: Semantics(
+        button: true,
+        label:
+            'Theme: ${_labelFor(themeMode)}. Activate to switch to ${_labelFor(next)}.',
+        excludeSemantics: true,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () {
+              ref.read(appSettingsProvider.notifier).setThemeMode(next);
+            },
+            // 44×44 minimum touch target.
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: palette.surface,
+                border: Border.all(color: palette.border, width: 1.0),
               ),
-            ),
-            child: Icon(
-              isDark ? Icons.nightlight_round : Icons.wb_sunny_outlined,
-              size: 16,
-              color: isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary,
+              child: Icon(
+                _iconFor(themeMode),
+                size: 18,
+                color: palette.textPrimary,
+              ),
             ),
           ),
         ),
