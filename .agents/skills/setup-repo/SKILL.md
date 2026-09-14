@@ -72,6 +72,13 @@ If Git is missing:
 - **Arch**: `sudo pacman -S git`
 - **Windows**: Install Git for Windows (`winget install Git.Git`)
 
+#### Configure Pre-Commit Hook
+Activate the repository's pre-commit hook (which prevents commits when AST static analysis or FSD architecture rules fail):
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+```
+
 ---
 
 ### Step 3: Verify Flutter & Dart SDKs

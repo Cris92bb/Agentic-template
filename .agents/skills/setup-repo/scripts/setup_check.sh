@@ -126,6 +126,24 @@ if command -v git >/dev/null 2>&1; then
     CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached")"
     info "Active branch: $CURRENT_BRANCH"
     pass "Inside valid git repository."
+
+    # Check pre-commit hook
+    HOOKS_PATH="$(git config --get core.hooksPath || true)"
+    if [ "$HOOKS_PATH" = ".githooks" ] && [ -x "$DIR/.githooks/pre-commit" ]; then
+      pass "Git pre-commit hook is active (enforcing FSD & AST analysis)."
+    elif [ -x "$DIR/.git/hooks/pre-commit" ]; then
+      pass "Git pre-commit hook is active in .git/hooks/pre-commit."
+    else
+      warn "Git pre-commit hook is NOT configured."
+      if [ "$AUTO_FIX" = true ]; then
+        info "Configuring Git hooks path to .githooks..."
+        git config core.hooksPath .githooks
+        chmod +x "$DIR/.githooks/pre-commit" 2>/dev/null || true
+        pass "Git pre-commit hook activated."
+      else
+        info "Run to activate hook: git config core.hooksPath .githooks"
+      fi
+    fi
   else
     fail "Directory is not a valid git repository."
   fi

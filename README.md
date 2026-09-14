@@ -41,6 +41,11 @@ flutter test
 ```
 CI runs the same checks on every push to `main` and on pull requests (`.github/workflows/ci.yml`).
 
+A git pre-commit hook is included in `.githooks/pre-commit` to prevent committing code if FSD architecture rules, AST static analysis, or architecture tests fail:
+```bash
+git config core.hooksPath .githooks
+```
+
 ### 4. Build Production Releases
 ```bash
 # Windows desktop bundle (Windows host)
