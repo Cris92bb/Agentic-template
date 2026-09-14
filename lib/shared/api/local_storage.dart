@@ -1,4 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// App-wide [LocalStorageAdapter], overridden in `main.dart` with a
+/// [SharedPrefsStorageAdapter]. Defaults to `null` (no persistence) so tests
+/// and previews work without platform storage.
+final localStorageProvider = Provider<LocalStorageAdapter?>((ref) => null);
 
 /// Abstract storage interface for persistent key-value configuration and data.
 abstract class LocalStorageAdapter {
