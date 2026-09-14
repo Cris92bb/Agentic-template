@@ -1,0 +1,21 @@
+analyzer:
+  exclude:
+    - build/**
+    - linux/**
+    - android/**
+    - ios/**
+    - web/**
+    - .dart_tool/**
+
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    avoid_print: true
+    use_key_in_widget_constructors: true
+    avoid_relative_lib_imports: true
+    directives_ordering: true
+    cancel_subscriptions: true
+    close_sinks: true
