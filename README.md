@@ -15,13 +15,22 @@ What's new in 2.0: see [CHANGELOG.md](CHANGELOG.md).
 
 ## 🚀 Quick Start
 
-### 1. Run the App
+### 1. Check Environment & Prerequisites
+Audit host OS, Git, Flutter/Dart SDKs, desktop/web build toolchains, and packages:
+```bash
+bash .agents/skills/setup-repo/scripts/setup_check.sh
+
+# Or auto-enable missing platform flags and fetch packages:
+bash .agents/skills/setup-repo/scripts/setup_check.sh --fix
+```
+
+### 2. Run the App
 ```bash
 flutter pub get
 flutter run -d windows   # or: -d linux, -d chrome
 ```
 
-### 2. Verify Architecture & Tests
+### 3. Verify Architecture & Tests
 ```bash
 # FSD import audit (exits with an error on violations)
 dart run tool/verify_fsd.dart --strict
@@ -32,7 +41,7 @@ flutter test
 ```
 CI runs the same checks on every push to `main` and on pull requests (`.github/workflows/ci.yml`).
 
-### 3. Build Production Releases
+### 4. Build Production Releases
 ```bash
 # Windows desktop bundle (Windows host)
 flutter build windows --release
@@ -44,7 +53,7 @@ bash build_release.sh linux
 bash build_release.sh web
 ```
 
-### 4. Linux Launcher (optional)
+### 5. Linux Launcher (optional)
 ```bash
 bash install_desktop_entry.sh
 ```
@@ -121,6 +130,7 @@ AI coding agents (e.g., Claude, Gemini, GPT) working in this repository must fol
 - [.agents/rules/design-system.md](.agents/rules/design-system.md): Semantic design tokens and palette.
 - [.agents/rules/form-factors.md](.agents/rules/form-factors.md): Multi-device layout guidelines.
 - [.agents/rules/git-commits.md](.agents/rules/git-commits.md): Conventional Commits standard.
+- [.agents/skills/setup-repo/SKILL.md](.agents/skills/setup-repo/SKILL.md): Environment inspection and onboarding skill.
 
 ---
 
