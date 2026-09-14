@@ -1,153 +1,102 @@
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+
+// Reuse the CLI auditor so the test and `dart run tool/verify_fsd.dart` can
+// never disagree about the rules.
+import '../../tool/verify_fsd.dart'
+    show FsdAuditResult, FsdViolation, auditDirectory;
+
+String _describe(List<FsdViolation> violations) => violations.join('\n\n');
 
 void main() {
   group('Feature-Sliced Design (FSD v2.1) Architecture Boundary Audit', () {
-    const layerHierarchy = {
-      'app': 1,
-      'pages': 2,
-      'widgets': 3,
-      'features': 4,
-      'entities': 5,
-      'shared': 6,
-    };
+    late FsdAuditResult result;
 
-    final importRegex = RegExp(r'''^\s*import\s+['"]([^'"]+)['"]''');
-
-    (String?, String?) parseLayerAndSlice(String path) {
-      final normalized = path.replaceAll(r'\', '/');
-      final parts = normalized.split('/');
-      final libIndex = parts.indexOf('lib');
-      if (libIndex == -1 || libIndex + 1 >= parts.length) {
-        return (null, null);
-      }
-
-      final layer = parts[libIndex + 1];
-      String? slice;
-      if (libIndex + 2 < parts.length && !parts[libIndex + 2].endsWith('.dart')) {
-        slice = parts[libIndex + 2];
-      }
-      return (layer, slice);
-    }
-
-    String? resolveImport(File sourceFile, String uri) {
-      if (uri.startsWith('dart:')) return null;
-      if (uri.startsWith('package:')) {
-        if (!uri.startsWith('package:agentic_template/')) return null;
-        return 'lib/${uri.substring('package:agentic_template/'.length)}';
-      }
-
-      final sourceDir = sourceFile.parent;
-      final targetFile = File('${sourceDir.path}/$uri');
-      final normalized = targetFile.uri.normalizePath().toFilePath();
-      final projectRoot = Directory.current.path;
-      if (normalized.startsWith(projectRoot)) {
-        return normalized.substring(projectRoot.length + 1).replaceAll(r'\', '/');
-      }
-      return normalized.replaceAll(r'\', '/');
-    }
-
-    test('verifies zero architectural breaches in lib/', () {
+    setUpAll(() {
       final libDir = Directory('lib');
       expect(libDir.existsSync(), isTrue, reason: 'lib/ directory must exist');
+      result = auditDirectory(libDir);
+    });
 
-      final dartFiles = libDir
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.dart'))
-          .toList();
+    test('scans the lib/ sources', () {
+      expect(result.totalScannedFiles, greaterThan(0));
+    });
 
-      final upwardViolations = <String>[];
-      final crossSliceViolations = <String>[];
-
-      for (final file in dartFiles) {
-        final relSourcePath = file.path.replaceAll(r'\', '/');
-        final (sourceLayer, sourceSlice) = parseLayerAndSlice(relSourcePath);
-        if (sourceLayer == null || !layerHierarchy.containsKey(sourceLayer)) {
-          continue;
-        }
-
-        final lines = file.readAsLinesSync();
-        for (int i = 0; i < lines.length; i++) {
-          final match = importRegex.firstMatch(lines[i]);
-          if (match == null) continue;
-
-          final importUri = match.group(1)!;
-          final targetResolvedPath = resolveImport(file, importUri);
-          if (targetResolvedPath == null) continue;
-
-          final (targetLayer, targetSlice) =
-              parseLayerAndSlice(targetResolvedPath);
-          if (targetLayer == null || !layerHierarchy.containsKey(targetLayer)) {
-            continue;
-          }
-
-          final sourceRank = layerHierarchy[sourceLayer]!;
-          final targetRank = layerHierarchy[targetLayer]!;
-
-          if (sourceRank > targetRank) {
-            upwardViolations.add(
-              '$relSourcePath:${i + 1} ($sourceLayer -> $targetLayer via $importUri)',
-            );
-          } else if (sourceLayer == targetLayer &&
-              sourceSlice != null &&
-              targetSlice != null &&
-              sourceSlice != targetSlice) {
-            crossSliceViolations.add(
-              '$relSourcePath:${i + 1} (slice $sourceSlice -> $targetSlice via $importUri)',
-            );
-          }
-        }
-      }
-
+    test('has no upward layer inversions', () {
       expect(
-        upwardViolations,
+        result.upwardViolations,
         isEmpty,
-        reason: 'Upward layer inversions detected!\n${upwardViolations.join('\n')}',
-      );
-
-      expect(
-        crossSliceViolations,
-        isEmpty,
-        reason: 'Cross-slice couplings detected!\n${crossSliceViolations.join('\n')}',
+        reason: _describe(result.upwardViolations),
       );
     });
 
-    test('shared layer must never import from higher layers', () {
-      final sharedDir = Directory('lib/shared');
-      if (!sharedDir.existsSync()) return;
-
-      final sharedFiles = sharedDir
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.dart'))
-          .toList();
-
-      final forbiddenImports = <String>[];
-
-      for (final file in sharedFiles) {
-        final relSourcePath = file.path.replaceAll(r'\', '/');
-
-        final lines = file.readAsLinesSync();
-        for (int i = 0; i < lines.length; i++) {
-          final match = importRegex.firstMatch(lines[i]);
-          if (match == null) continue;
-          final importUri = match.group(1)!;
-          final resolved = resolveImport(file, importUri);
-          if (resolved == null) continue;
-
-          final (layer, _) = parseLayerAndSlice(resolved);
-          if (layer != null && layer != 'shared') {
-            forbiddenImports.add('$relSourcePath:${i + 1} imports $importUri');
-          }
-        }
-      }
-
+    test('has no cross-slice couplings', () {
       expect(
-        forbiddenImports,
+        result.crossSliceViolations,
         isEmpty,
-        reason: 'Shared layer must not import from higher layers:\n${forbiddenImports.join('\n')}',
+        reason: _describe(result.crossSliceViolations),
       );
+    });
+
+    test('imports slices only through their public barrels', () {
+      expect(
+        result.barrelViolations,
+        isEmpty,
+        reason: _describe(result.barrelViolations),
+      );
+    });
+  });
+
+  group('FSD auditor rules', () {
+    late Directory root;
+
+    void writeFile(String path, String contents) {
+      File('${root.path}/$path')
+        ..createSync(recursive: true)
+        ..writeAsStringSync(contents);
+    }
+
+    setUp(() {
+      root = Directory.systemTemp.createTempSync('fsd_audit_');
+    });
+
+    tearDown(() {
+      root.deleteSync(recursive: true);
+    });
+
+    test('flags upward, cross-slice and deep imports', () {
+      writeFile('lib/shared/shared.dart', "export 'ui/tokens.dart';\n");
+      // Segments of a segmented layer may import each other.
+      writeFile('lib/shared/ui/tokens.dart', "import '../lib/helpers.dart';\n");
+      writeFile('lib/shared/lib/helpers.dart', '');
+      writeFile(
+        'lib/shared/lib/bad.dart',
+        "import 'package:agentic_template/features/a/a.dart';\n",
+      );
+      writeFile('lib/features/a/a.dart', "export 'ui/a_widget.dart';\n");
+      writeFile(
+        'lib/features/a/ui/a_widget.dart',
+        "import '../../../shared/shared.dart';\n"
+            "import '../../b/b.dart';\n",
+      );
+      writeFile('lib/features/b/b.dart', '');
+      writeFile(
+        'lib/pages/home/home.dart',
+        "import '../../features/a/ui/a_widget.dart';\n",
+      );
+
+      final result = auditDirectory(Directory('${root.path}/lib'));
+
+      expect(result.upwardViolations.map((v) => v.importUri), [
+        'package:agentic_template/features/a/a.dart',
+      ]);
+      expect(result.crossSliceViolations.map((v) => v.importUri), [
+        '../../b/b.dart',
+      ]);
+      expect(result.barrelViolations.map((v) => v.importUri), [
+        '../../features/a/ui/a_widget.dart',
+      ]);
     });
   });
 }

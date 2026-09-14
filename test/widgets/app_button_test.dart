@@ -25,9 +25,7 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('does not fire onPressed when disabled', (tester) async {
-      bool pressed = false;
-
+    testWidgets('is not tappable when onPressed is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -39,7 +37,31 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('Disabled Button'));
+      final inkWell = tester.widget<InkWell>(
+        find.descendant(
+          of: find.byType(AppButton),
+          matching: find.byType(InkWell),
+        ),
+      );
+      expect(inkWell.onTap, isNull);
+    });
+
+    testWidgets('does not fire onPressed while loading', (tester) async {
+      bool pressed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AppButton(
+              label: 'Loading Button',
+              isLoading: true,
+              onPressed: () => pressed = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Loading Button'));
       await tester.pump();
 
       expect(pressed, isFalse);
