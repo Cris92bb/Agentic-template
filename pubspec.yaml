@@ -1,7 +1,7 @@
 name: agentic_template
-description: "A clean, modular Flutter template designed for agentic AI pair-programming, following strict Feature-Sliced Design (FSD v2.1) with Wearable, Foldable, Smartphone, Web, and Linux desktop placeholders."
+description: "A clean, modular Flutter template designed for agentic AI pair-programming, following strict Feature-Sliced Design (FSD v2.1) with Wearable, Foldable, Smartphone, Web, Windows and Linux desktop layouts."
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.13.2

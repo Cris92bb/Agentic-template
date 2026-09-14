@@ -62,11 +62,13 @@ graph TD
 2. **Horizontal Slice Isolation**: Slices within the same layer (`features/foo` and `features/bar`) must **NEVER** import each other directly. Interactions must be orchestrated upwards at the `widgets` or `pages` layer via composition, callbacks, or shared entities.
 3. **Public API Barrels**: Every slice must expose its capabilities via a single public barrel file (`<slice>.dart`). External callers must never reach into private inner subdirectories.
 
+`app` and `shared` have no slices: they are split into **segments** (`app/theme`, `shared/ui`, `shared/lib`, `shared/api`) that may import each other. Other layers consume `shared` through `shared/shared.dart`.
+
 ---
 
 ## 4. Automated Architecture Enforcement
 
 To ensure AI agents and contributors strictly adhere to FSD:
-- **CLI AST Scanner**: `dart run tool/verify_fsd.dart --strict`
-- **Automated CI Test**: `flutter test test/architecture/fsd_architecture_test.dart`
-Any architectural regression fails the build immediately.
+- **CLI import scanner**: `dart run tool/verify_fsd.dart --strict` scans every `import` and `export` directive in `lib/` (line-based, not a full AST parse) and reports upward layer imports, cross-slice imports and deep imports that bypass a public barrel. Without `--strict` it only prints the report.
+- **Automated test**: `flutter test test/architecture/fsd_architecture_test.dart` runs the same auditor, plus fixture tests proving each rule fires.
+- **CI**: `.github/workflows/ci.yml` runs the audit, `flutter analyze` and `flutter test` on every push to `main` and on pull requests.

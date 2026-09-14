@@ -60,11 +60,15 @@ import 'package:agentic_template/features/theme_toggle/ui/theme_toggle_button.da
 
 ---
 
+`app` and `shared` are split into segments (`app/theme`, `shared/ui`, `shared/lib`, `shared/api`) rather than slices: segments may import each other, and other layers import `shared` only through `shared/shared.dart`.
+
+---
+
 ## 4. Automated Architecture Verification
 
-Always run the automated AST verifier:
+Always run the automated import verifier. It scans `import` and `export` directives and reports upward layer imports, cross-slice imports and deep imports that bypass a public barrel:
 ```bash
 dart run tool/verify_fsd.dart --strict
 flutter test test/architecture/fsd_architecture_test.dart
 ```
-Any violation causes CI failure.
+Any violation fails CI (`.github/workflows/ci.yml`).
