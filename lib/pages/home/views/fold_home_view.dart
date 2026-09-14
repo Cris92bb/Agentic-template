@@ -42,13 +42,16 @@ class FoldHomeView extends StatelessWidget {
                           size: 20,
                         ),
                         const SizedBox(width: AppTokens.spaceSm),
-                        Text(
-                          'Foldable Tier (Dual Pane)',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: textPrimary,
-                            letterSpacing: -0.3,
+                        Expanded(
+                          child: Text(
+                            'Foldable Tier (Dual Pane)',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: textPrimary,
+                              letterSpacing: -0.3,
+                            ),
                           ),
                         ),
                       ],

@@ -8,13 +8,19 @@ import 'package:flutter/material.dart';
 class WearableUtils {
   const WearableUtils._();
 
-  /// Maximum logical width or height (shortest side) considered a smartwatch display.
-  static const double maxWatchShortestSide = 320.0;
+  /// Maximum logical size of both display sides for a smartwatch display.
+  static const double maxWatchSide = 320.0;
+
+  @Deprecated('Use maxWatchSide: both display sides must now fit within it.')
+  static const double maxWatchShortestSide = maxWatchSide;
 
   /// Returns true if the current viewport corresponds to a smartwatch / wearable display.
+  ///
+  /// Both sides must be small: a short but wide desktop or browser window is
+  /// not a watch.
   static bool isWearable(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    return size.shortestSide <= maxWatchShortestSide && size.shortestSide > 0;
+    return size.longestSide <= maxWatchSide && size.shortestSide > 0;
   }
 
   /// Calculates safe inset padding so content does not clip on circular watch displays.

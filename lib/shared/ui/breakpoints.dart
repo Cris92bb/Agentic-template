@@ -3,7 +3,7 @@ import 'wearable_utils.dart';
 
 /// Semantic viewport tiers spanning Wearable, Smartphone, Foldable, and Desktop/Web.
 enum ScreenTier {
-  /// Smartwatches / Wear OS (circular or compact square displays <= 320px)
+  /// Smartwatches / Wear OS (both display sides <= 320px)
   wearable,
 
   /// Smartphones & Folded devices (portrait single-column width < 600px)
@@ -38,9 +38,6 @@ class Breakpoints {
       return ScreenTier.wearable;
     }
     final width = MediaQuery.sizeOf(context).width;
-    if (width <= wearableMax) {
-      return ScreenTier.wearable;
-    }
     if (width < compactMax) {
       return ScreenTier.compact;
     }

@@ -35,13 +35,16 @@ class PhoneHomeView extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: AppTokens.spaceSm),
-                  Text(
-                    'Smartphone Tier (Compact)',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: textPrimary,
-                      letterSpacing: -0.3,
+                  Expanded(
+                    child: Text(
+                      'Smartphone Tier (Compact)',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: textPrimary,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
                 ],
@@ -72,16 +75,19 @@ class PhoneHomeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Feature-Sliced Design',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: textPrimary,
+                  Expanded(
+                    child: Text(
+                      'Feature-Sliced Design',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: textPrimary,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: AppTokens.spaceSm),
                   const StatusBadge(
                     label: 'FSD v2.1',
                     tone: BadgeTone.primary,
@@ -90,7 +96,7 @@ class PhoneHomeView extends StatelessWidget {
               ),
               const SizedBox(height: AppTokens.spaceSm),
               Text(
-                'Layers: app ≻ pages ≻ widgets ≻ features ≻ entities ≻ shared. Zero upward inversions and zero cross-slice couplings enforced via automated AST verifier.',
+                'Layers: app ≻ pages ≻ widgets ≻ features ≻ entities ≻ shared. Zero upward inversions, cross-slice couplings and deep imports, enforced by tool/verify_fsd.dart.',
                 style: TextStyle(
                   fontSize: 13,
                   color: textSecondary,

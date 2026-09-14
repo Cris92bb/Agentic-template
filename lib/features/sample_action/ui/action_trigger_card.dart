@@ -66,17 +66,20 @@ class ActionTriggerCard extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Sample Action Slice',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: textPrimary,
-                  letterSpacing: -0.3,
+              Expanded(
+                child: Text(
+                  'Sample Action Slice',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: textPrimary,
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ),
+              const SizedBox(width: AppTokens.spaceSm),
               StatusBadge(
                 label: 'Count: ${counterState.count}',
                 tone: counterState.count > 0
@@ -96,20 +99,22 @@ class ActionTriggerCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppTokens.spaceMd),
-          Row(
+          // Wrap instead of Row so the buttons flow onto a new line on narrow
+          // cards (phone, fold detail pane) instead of overflowing.
+          Wrap(
+            spacing: AppTokens.spaceSm,
+            runSpacing: AppTokens.spaceSm,
             children: [
               AppButton(
                 label: 'Increment',
                 icon: Icons.add_rounded,
                 onPressed: controller.increment,
               ),
-              const SizedBox(width: AppTokens.spaceSm),
               AppButton.secondary(
                 label: 'Decrement',
                 icon: Icons.remove_rounded,
                 onPressed: counterState.count > 0 ? controller.decrement : null,
               ),
-              const Spacer(),
               if (counterState.count > 0)
                 AppButton.ghost(
                   label: 'Reset',

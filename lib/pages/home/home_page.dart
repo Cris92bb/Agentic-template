@@ -30,7 +30,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     // If active tier is Wearable, display the watch-optimized glanceable view
     if (tier == ScreenTier.wearable) {
+      // The watch view has no app bar, so the frame hosts the device picker.
       return const FormFactorPreviewFrame(
+        showDevicePicker: true,
         child: WearableHomeView(),
       );
     }

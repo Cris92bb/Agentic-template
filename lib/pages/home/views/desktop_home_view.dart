@@ -112,12 +112,15 @@ class DesktopHomeView extends StatelessWidget {
                                   color: AppTokens.accentSuccess,
                                 ),
                                 const SizedBox(width: AppTokens.spaceSm),
-                                Text(
-                                  'Linux Platform Integration',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: textPrimary,
+                                Expanded(
+                                  child: Text(
+                                    'Linux Platform Integration',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: textPrimary,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -155,19 +158,22 @@ class DesktopHomeView extends StatelessWidget {
                                   color: AppTokens.primaryLight,
                                 ),
                                 const SizedBox(width: AppTokens.spaceSm),
-                                Text(
-                                  'Optimized for Agentic Development',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: textPrimary,
+                                Expanded(
+                                  child: Text(
+                                    'Optimized for Agentic Development',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: textPrimary,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: AppTokens.spaceSm),
                             Text(
-                              'Equipped with AGENTS.md, GEMINI.md, .agents/rules, and verify_fsd.dart AST scanner so autonomous coding agents never break architectural boundaries.',
+                              'Equipped with AGENTS.md, GEMINI.md, .agents/rules, and the verify_fsd.dart import scanner so autonomous coding agents never break architectural boundaries.',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: textSecondary,

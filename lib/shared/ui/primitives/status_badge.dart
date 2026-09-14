@@ -65,24 +65,30 @@ class StatusBadge extends StatelessWidget {
         borderRadius: AppTokens.radiusFull,
         border: Border.all(color: border, width: 1.0),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: fg),
-            const SizedBox(width: 4),
+      // A single rich text (instead of a Row) truncates with an ellipsis when
+      // the badge is width-constrained, yet still sizes naturally inside Rows.
+      child: Text.rich(
+        TextSpan(
+          children: [
+            if (icon != null)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(icon, size: 12, color: fg),
+                ),
+              ),
+            TextSpan(text: label),
           ],
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: fg,
-              letterSpacing: -0.1,
-            ),
-          ),
-        ],
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: fg,
+          letterSpacing: -0.1,
+        ),
       ),
     );
   }

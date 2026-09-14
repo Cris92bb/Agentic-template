@@ -170,30 +170,44 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: textPrimary,
-                          letterSpacing: -0.5,
+                      // Bounded so a long title truncates instead of squeezing
+                      // the header controls.
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 240),
+                        child: Text(
+                          widget.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: textPrimary,
+                            letterSpacing: -0.5,
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      Flexible(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const DeviceSimulatorPicker(),
-                              const SizedBox(width: AppTokens.spaceSm),
-                              const ThemeToggleButton(),
-                              if (widget.actions != null) ...[
+                      const SizedBox(width: AppTokens.spaceMd),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // The chip row needs desktop width; foldables
+                                // and tablets use the popup picker.
+                                DeviceSimulatorPicker(
+                                  compact: tier != ScreenTier.desktopWeb,
+                                ),
                                 const SizedBox(width: AppTokens.spaceSm),
-                                ...widget.actions!,
+                                const ThemeToggleButton(),
+                                if (widget.actions != null) ...[
+                                  const SizedBox(width: AppTokens.spaceSm),
+                                  ...widget.actions!,
+                                ],
                               ],
-                            ],
+                            ),
                           ),
                         ),
                       ),
