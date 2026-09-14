@@ -32,8 +32,7 @@ class FormFactorPreviewFrame extends ConsumerWidget {
       return child;
     }
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
     final device = SimulatedDevice.values.firstWhere(
       (d) => d.targetTier == activeTier,
@@ -60,7 +59,7 @@ class FormFactorPreviewFrame extends ConsumerWidget {
     );
 
     return Material(
-      color: isDark ? AppTokens.darkCanvasBg : AppTokens.lightCanvasBg,
+      color: palette.canvas,
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppTokens.spaceLg),
@@ -80,24 +79,14 @@ class FormFactorPreviewFrame extends ConsumerWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppTokens.darkSurfaceBg
-                              : AppTokens.lightSurfaceBg,
+                          color: palette.surface,
                           borderRadius: AppTokens.radiusFull,
-                          border: Border.all(
-                            color: isDark
-                                ? AppTokens.darkBorder
-                                : AppTokens.lightBorder,
-                          ),
+                          border: Border.all(color: palette.border),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              device.icon,
-                              size: 14,
-                              color: AppTokens.primaryLight,
-                            ),
+                            Icon(device.icon, size: 14, color: palette.accent),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
@@ -106,9 +95,7 @@ class FormFactorPreviewFrame extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? AppTokens.darkTextSecondary
-                                      : AppTokens.lightTextSecondary,
+                                  color: palette.textSecondary,
                                 ),
                               ),
                             ),
@@ -132,15 +119,11 @@ class FormFactorPreviewFrame extends ConsumerWidget {
                   height: size.height,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppTokens.darkCanvasBg
-                        : AppTokens.lightCanvasBg,
+                    color: palette.canvas,
                     shape: isWatch ? BoxShape.circle : BoxShape.rectangle,
                     borderRadius: isWatch ? null : AppTokens.radiusXl,
                     border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFF1E293B),
+                      color: palette.deviceBezel,
                       width: bezelWidth,
                     ),
                     boxShadow: AppTokens.floatingShadow,
@@ -150,11 +133,14 @@ class FormFactorPreviewFrame extends ConsumerWidget {
                         ? BorderRadius.circular(viewportSize.width / 2)
                         : BorderRadius.circular(24.0),
                     child: MediaQuery(
+                      // The simulated device has no system insets or hinges of
+                      // its own, whatever the host device reports.
                       data: MediaQuery.of(context).copyWith(
                         size: viewportSize,
                         padding: EdgeInsets.zero,
                         viewPadding: EdgeInsets.zero,
                         viewInsets: EdgeInsets.zero,
+                        displayFeatures: const [],
                       ),
                       child: child,
                     ),

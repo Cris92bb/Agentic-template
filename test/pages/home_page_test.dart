@@ -1,5 +1,7 @@
 import 'package:agentic_template/app/app.dart';
+import 'package:agentic_template/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,7 +24,8 @@ Future<void> _tapDeviceChip(WidgetTester tester, String label) async {
 
 /// Selects a device from the compact popup picker.
 Future<void> _selectFromPopup(WidgetTester tester, String label) async {
-  await tester.tap(find.byTooltip('Simulate Device Viewport'));
+  // The Settings destination also hosts a picker, offstage in the IndexedStack.
+  await tester.tap(find.byTooltip('Simulate Device Viewport').hitTestable());
   await tester.pumpAndSettle();
   await tester.tap(find.text(label).last);
   await tester.pumpAndSettle();
@@ -85,6 +88,62 @@ void main() {
       await _selectFromPopup(tester, 'Desktop / Web');
 
       expect(find.text('Desktop & Web Workspace (Tier 4)'), findsOneWidget);
+    });
+  });
+
+  group('HomePage navigation', () {
+    Finder railDestination(String label) => find.descendant(
+          of: find.byType(NavigationRail),
+          matching: find.text(label),
+        );
+
+    testWidgets('rail destinations switch the visible view', (tester) async {
+      await _pumpApp(tester, const Size(1280, 800));
+
+      await tester.tap(railDestination('Slices'));
+      await tester.pumpAndSettle();
+      expect(find.text('features').hitTestable(), findsOneWidget);
+
+      await tester.tap(railDestination('Settings'));
+      await tester.pumpAndSettle();
+      expect(find.text('High contrast').hitTestable(), findsOneWidget);
+    });
+
+    testWidgets('Ctrl+3 opens Settings and Ctrl+1 returns to Overview',
+        (tester) async {
+      await _pumpApp(tester, const Size(1280, 800));
+
+      Future<void> pressCtrl(LogicalKeyboardKey key) async {
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(key);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pumpAndSettle();
+      }
+
+      await pressCtrl(LogicalKeyboardKey.digit3);
+      expect(find.text('High contrast').hitTestable(), findsOneWidget);
+
+      await pressCtrl(LogicalKeyboardKey.digit1);
+      expect(
+        find.text('Desktop & Web Workspace (Tier 4)').hitTestable(),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('high contrast setting applies the high contrast palette',
+        (tester) async {
+      await _pumpApp(tester, const Size(1280, 800));
+      await tester.tap(railDestination('Settings'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+
+      final palette = AppPalette.of(tester.element(find.text('High contrast')));
+      expect(
+        palette.textSecondary,
+        AppPalette.highContrastLight.textSecondary,
+      );
     });
   });
 }

@@ -59,6 +59,7 @@ class _AgenticAppState extends ConsumerState<AgenticApp>
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
+    final highContrast = ref.watch(highContrastProvider);
 
     ref.listen<ThemeMode>(themeModeProvider, (_, next) {
       _syncTheme(next);
@@ -68,8 +69,13 @@ class _AgenticAppState extends ConsumerState<AgenticApp>
       title: 'Agentic Template',
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AppScrollBehavior(),
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme:
+          highContrast ? AppTheme.highContrastLightTheme : AppTheme.lightTheme,
+      darkTheme:
+          highContrast ? AppTheme.highContrastDarkTheme : AppTheme.darkTheme,
+      // Used when the platform itself requests high contrast.
+      highContrastTheme: AppTheme.highContrastLightTheme,
+      highContrastDarkTheme: AppTheme.highContrastDarkTheme,
       themeMode: themeMode,
       home: const HomePage(),
     );

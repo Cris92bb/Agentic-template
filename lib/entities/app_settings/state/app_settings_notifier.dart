@@ -66,6 +66,11 @@ final themeModeProvider = Provider<ThemeMode>((ref) {
   return ref.watch(appSettingsProvider).themeMode;
 });
 
+/// Convenience provider for the high-contrast preference.
+final highContrastProvider = Provider<bool>((ref) {
+  return ref.watch(appSettingsProvider).isHighContrast;
+});
+
 /// Convenience provider for active simulated screen tier (null if auto-detect).
 final simulatedTierProvider = Provider<ScreenTier?>((ref) {
   return ref.watch(appSettingsProvider).simulatedTier;

@@ -11,18 +11,12 @@ class WearableHomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final counterState = ref.watch(counterProvider);
     final controller = ref.read(counterProvider.notifier);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
     final circularPadding = WearableUtils.getSafeCircularPadding(context);
 
-    final textPrimary =
-        isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary;
-    final textSecondary =
-        isDark ? AppTokens.darkTextSecondary : AppTokens.lightTextSecondary;
-
     return Scaffold(
-      backgroundColor: isDark ? AppTokens.darkCanvasBg : AppTokens.lightCanvasBg,
+      backgroundColor: palette.canvas,
       body: Center(
         child: Padding(
           padding: circularPadding,
@@ -37,10 +31,10 @@ class WearableHomeView extends ConsumerWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.watch_rounded,
                       size: 14,
-                      color: AppTokens.primaryLight,
+                      color: palette.accent,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -49,7 +43,7 @@ class WearableHomeView extends ConsumerWidget {
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
-                        color: textSecondary,
+                        color: palette.textSecondary,
                       ),
                     ),
                   ],
@@ -62,7 +56,7 @@ class WearableHomeView extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.w900,
-                    color: textPrimary,
+                    color: palette.textPrimary,
                     height: 1.0,
                     letterSpacing: -1.0,
                   ),
@@ -72,7 +66,7 @@ class WearableHomeView extends ConsumerWidget {
                   'Taps recorded',
                   style: TextStyle(
                     fontSize: 10,
-                    color: textSecondary,
+                    color: palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -84,28 +78,26 @@ class WearableHomeView extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline_rounded),
                       iconSize: 28,
-                      color: textSecondary,
+                      color: palette.textSecondary,
                       onPressed:
                           counterState.count > 0 ? controller.decrement : null,
                     ),
                     const SizedBox(width: 8),
                     InkWell(
-                      borderRadius: AppTokens.radiusFull,
+                      customBorder: const CircleBorder(),
                       onTap: controller.increment,
                       child: Container(
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isDark
-                              ? AppTokens.darkActionBg
-                              : AppTokens.lightActionBg,
+                          color: palette.actionBg,
                           boxShadow: AppTokens.floatingShadow,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.add_rounded,
                           size: 24,
-                          color: Colors.white,
+                          color: palette.actionFg,
                         ),
                       ),
                     ),

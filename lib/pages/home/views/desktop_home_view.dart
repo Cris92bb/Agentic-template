@@ -9,13 +9,7 @@ class DesktopHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final textPrimary =
-        isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary;
-    final textSecondary =
-        isDark ? AppTokens.darkTextSecondary : AppTokens.lightTextSecondary;
+    final palette = AppPalette.of(context);
 
     return Center(
       child: ConstrainedBox(
@@ -27,21 +21,19 @@ class DesktopHomeView extends StatelessWidget {
           children: [
             // Welcome Hero Card
             AppCard(
-              backgroundColor: isDark
-                  ? AppTokens.darkSurfaceBg
-                  : AppTokens.lightSurfaceBg,
+              backgroundColor: palette.surface,
               child: Row(
                 children: [
                   Container(
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppTokens.primaryLight.withValues(alpha: 0.2),
+                      color: palette.accent.withValues(alpha: 0.2),
                       borderRadius: AppTokens.radiusMd,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.desktop_windows_rounded,
-                      color: AppTokens.primaryLight,
+                      color: palette.accent,
                       size: 26,
                     ),
                   ),
@@ -55,16 +47,16 @@ class DesktopHomeView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: textPrimary,
+                            color: palette.textPrimary,
                             letterSpacing: -0.4,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Expanded multi-column layout for Linux GTK desktop and Web browsers (>= 1024px). Equipped with navigation rail and device simulator.',
+                          'Expanded multi-column layout for desktop (Windows, Linux) and Web browsers (>= 1024px). Equipped with navigation rail, keyboard shortcuts and device simulator.',
                           style: TextStyle(
                             fontSize: 13,
-                            color: textSecondary,
+                            color: palette.textSecondary,
                           ),
                         ),
                       ],
@@ -72,7 +64,7 @@ class DesktopHomeView extends StatelessWidget {
                   ),
                   const SizedBox(width: AppTokens.spaceMd),
                   const StatusBadge(
-                    label: 'Linux + Web Ready',
+                    label: 'Desktop + Web Ready',
                     tone: BadgeTone.info,
                     icon: Icons.check_circle_outline,
                   ),
@@ -106,10 +98,10 @@ class DesktopHomeView extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.terminal_rounded,
                                   size: 18,
-                                  color: AppTokens.accentSuccess,
+                                  color: palette.successFg,
                                 ),
                                 const SizedBox(width: AppTokens.spaceSm),
                                 Expanded(
@@ -119,7 +111,7 @@ class DesktopHomeView extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: textPrimary,
+                                      color: palette.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -127,10 +119,10 @@ class DesktopHomeView extends StatelessWidget {
                             ),
                             const SizedBox(height: AppTokens.spaceSm),
                             Text(
-                              'Native GTK runner wired with MethodChannel("app/theme") for live desktop theme sync and MethodChannel("app/window") for dragging and resizing.',
+                              'Native GTK runner wired with MethodChannel("app/theme") for live desktop theme sync and MethodChannel("app/window") for custom title bars, available in Dart as WindowControlService (drag and resize on X11).',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: textSecondary,
+                                color: palette.textSecondary,
                                 height: 1.4,
                               ),
                             ),
@@ -152,10 +144,10 @@ class DesktopHomeView extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.smart_toy_outlined,
                                   size: 18,
-                                  color: AppTokens.primaryLight,
+                                  color: palette.accent,
                                 ),
                                 const SizedBox(width: AppTokens.spaceSm),
                                 Expanded(
@@ -165,7 +157,7 @@ class DesktopHomeView extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: textPrimary,
+                                      color: palette.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -176,7 +168,7 @@ class DesktopHomeView extends StatelessWidget {
                               'Equipped with AGENTS.md, GEMINI.md, .agents/rules, and the verify_fsd.dart import scanner so autonomous coding agents never break architectural boundaries.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: textSecondary,
+                                color: palette.textSecondary,
                                 height: 1.4,
                               ),
                             ),

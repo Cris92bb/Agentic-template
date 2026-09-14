@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_palette.dart';
 import '../tokens.dart';
 
 enum AppButtonVariant { primary, secondary, ghost }
@@ -46,33 +47,21 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final palette = AppPalette.of(context);
 
-    Color bg;
-    Color fg;
-    Border? border;
-
-    switch (variant) {
-      case AppButtonVariant.primary:
-        bg = isDark ? AppTokens.darkActionBg : AppTokens.lightActionBg;
-        fg = isDark ? AppTokens.darkActionFg : AppTokens.lightActionFg;
-        border = null;
-        break;
-      case AppButtonVariant.secondary:
-        bg = isDark ? AppTokens.darkSurfaceBg : AppTokens.lightSurfaceBg;
-        fg = isDark ? AppTokens.darkTextPrimary : AppTokens.lightTextPrimary;
-        border = Border.all(
-          color: isDark ? AppTokens.darkBorder : AppTokens.lightBorder,
-          width: 1.0,
-        );
-        break;
-      case AppButtonVariant.ghost:
-        bg = Colors.transparent;
-        fg = isDark ? AppTokens.darkTextSecondary : AppTokens.lightTextSecondary;
-        border = null;
-        break;
-    }
+    final (Color bg, Color fg, Border? border) = switch (variant) {
+      AppButtonVariant.primary => (palette.actionBg, palette.actionFg, null),
+      AppButtonVariant.secondary => (
+          palette.surface,
+          palette.textPrimary,
+          Border.all(color: palette.border, width: 1.0),
+        ),
+      AppButtonVariant.ghost => (
+          Colors.transparent,
+          palette.textSecondary,
+          null,
+        ),
+    };
 
     final isClickable = onPressed != null && !isLoading;
 
