@@ -43,3 +43,19 @@ Brand accents that are the same in every theme remain available on `AppTokens`:
 - Every UI widget must look polished in light, dark and both high-contrast themes; test components under each.
 - Text and icons must meet WCAG contrast (4.5:1 for body text, 3:1 for large text and icons).
 - Interactive targets must be at least 44×44.
+
+---
+
+## 5. Strict Design Token Enforcement (Zero Hardcoded Colors)
+
+1. **No Raw Color Literals**: Constructing ad-hoc colors with `Color(0x...)` or random hex literals is strictly prohibited in widgets, modals, views, or custom painters.
+2. **Single Source of Truth**: All colors must be read from `AppTokens`, `AppPalette.of(context)`, or `Theme.of(context)`.
+3. **Shadow & Border Tokens**: Use standard token definitions (`AppTokens.lightCardShadow`, `AppTokens.darkCardShadow`, `AppTokens.floatingShadow`, `AppTokens.lightBorder`, `AppTokens.darkBorder`) to prevent visual fragmentation.
+
+---
+
+## 6. File Size & Clean Componentization Standard (<= 300 LOC)
+
+1. **Hard Limit**: Strive to keep all Dart source files **under 300 lines of code**.
+2. **Component Separation**: Decompose large files and monolithic views into focused, single-responsibility sub-components in dedicated `components/` or `views/` subdirectories.
+3. **Comprehensive Doc Comments**: Every component, constructor, and method should feature descriptive Dart doc comments (`///`) detailing visual mechanics, states, parameters, and architectural classification.
