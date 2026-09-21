@@ -72,3 +72,21 @@ dart run tool/verify_fsd.dart --strict
 flutter test test/architecture/fsd_architecture_test.dart
 ```
 Any violation fails CI (`.github/workflows/ci.yml`).
+
+---
+
+## 5. File Size & Componentization Standard (<= 300 LOC)
+
+To maintain clarity, readability, and testability across all FSD slices:
+- **Maximum File Target**: Ideally, no Dart source file should exceed **300 lines of code (LOC)**.
+- **Componentization Hierarchy**: Large widgets, monolithic views, and complex modal sheets must be decomposed into focused, single-responsibility sub-widgets located in a `components/` or `views/` subfolder within the slice (e.g., `lib/pages/home/views/`, `lib/widgets/adaptive_scaffold/components/`).
+- **Doctype & Documentation Comments**: Every component, public class, method, and provider must include comprehensive Dart doc comments (`///`) detailing its responsibilities, parameters, and architectural layer.
+
+---
+
+## 6. Strict Design Token Consistency & Zero Hardcoded Colors
+
+All UI elements across all FSD layers must strictly adhere to the project's design token system:
+- **No Hardcoded Colors**: Constructing colors directly with `Color(0x...)` or random hex literals in UI files is strictly prohibited.
+- **Single Source of Truth**: All palette shades, background colors, text colors, borders, shadows, and radii must reference `AppTokens`, `AppPalette.of(context)`, or `Theme.of(context)`.
+- **Palette Fidelity**: Maintain consistent light, dark, and high-contrast palettes across all form factors without visual fragmentation.

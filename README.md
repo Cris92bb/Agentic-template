@@ -41,7 +41,7 @@ flutter test
 ```
 CI runs the same checks on every push to `main` and on pull requests (`.github/workflows/ci.yml`).
 
-A git pre-commit hook is included in `.githooks/pre-commit` to prevent committing code if FSD architecture rules, AST static analysis, or architecture tests fail:
+A git hooks suite is included in `.githooks/` (`pre-commit` prevents committing code on FSD, AST, or test failure; `pre-push` blocks direct pushes to `develop` and `main`, requiring Pull Requests):
 ```bash
 git config core.hooksPath .githooks
 ```
@@ -123,14 +123,27 @@ final palette = AppPalette.of(context);
 Text('Title', style: TextStyle(color: palette.textPrimary));
 ```
 
-See [.agents/rules/design-system.md](.agents/rules/design-system.md).
+See [docs/design_system.md](docs/design_system.md) and [.agents/rules/design-system.md](.agents/rules/design-system.md).
+
+---
+
+## 🏛️ Code Quality, Architecture & Design Tokens
+
+This repository adheres to strict code quality and architectural guidelines:
+
+- **Feature-Sliced Design (FSD v2.1)**: Strictly unidirectional dependencies (`app` → `pages` → `widgets` → `features` → `entities` → `shared`) with zero cross-slice coupling and public barrel encapsulation. Verify with `dart run tool/verify_fsd.dart --strict`.
+- **File Sizing & Modularity (<= 300 LOC)**: All Dart source files must remain under 300 lines of code. Monolithic views and compound builders are broken down into clean, modular sub-components in dedicated `components/` or `views/` subdirectories.
+- **Doctype & Documentation Comments**: Every component, class, method, and state provider is documented with descriptive Dart doc comments (`///`) providing role descriptions, architectural context, and parameter specifications.
+- **Design Token Consistency & Zero Hardcoded Colors**: No hardcoded `Color(0x...)` or random hex literals in UI files. All visual styles, borders, radii, and shadows reference `AppTokens`, `AppPalette.of(context)`, or `Theme.of(context)`.
+- **Modern Riverpod 3 State Management**: Employs Riverpod 3 `Notifier` and `NotifierProvider` primitives across feature controllers and domain entities with fallback state access for isolated unit testing.
+- **Branching & Pull Request Policy**: Direct pushes to `develop` and `main` are blocked by `.githooks/pre-push`. All changes are developed on dedicated feature branches and merged via Pull Requests after passing CI checks.
 
 ---
 
 ## 🤖 AI Agent Workflow
 
 AI coding agents (e.g., Claude, Gemini, GPT) working in this repository must follow:
-- [AGENTS.md](AGENTS.md): Global agent guidelines and commit policies.
+- [AGENTS.md](AGENTS.md) (with symlinks [CLAUDE.md](CLAUDE.md) and [GEMINI.md](GEMINI.md)): Global agent guidelines and commit policies.
 - [.agents/rules/architecture.md](.agents/rules/architecture.md): FSD v2.1 specifications.
 - [.agents/rules/design-system.md](.agents/rules/design-system.md): Semantic design tokens and palette.
 - [.agents/rules/form-factors.md](.agents/rules/form-factors.md): Multi-device layout guidelines.
