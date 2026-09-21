@@ -72,3 +72,21 @@ To ensure AI agents and contributors strictly adhere to FSD:
 - **CLI import scanner**: `dart run tool/verify_fsd.dart --strict` scans every `import` and `export` directive in `lib/` (line-based, not a full AST parse) and reports upward layer imports, cross-slice imports and deep imports that bypass a public barrel. Without `--strict` it only prints the report.
 - **Automated test**: `flutter test test/architecture/fsd_architecture_test.dart` runs the same auditor, plus fixture tests proving each rule fires.
 - **CI**: `.github/workflows/ci.yml` runs the audit, `flutter analyze` and `flutter test` on every push to `main` and on pull requests.
+
+---
+
+## 5. File Size & Componentization Standard (<= 300 LOC)
+
+To maintain long-term architectural hygiene and code scannability across all FSD slices:
+- **Maximum File Threshold**: All Dart source files must ideally remain **under 300 lines of code (LOC)**.
+- **Componentized Sub-Directories**: Large multi-responsibility files (such as modals, compound views, and complex page orchestrators) must be broken down into modular, single-responsibility sub-widgets organized in a `components/` or `views/` subfolder within their parent slice.
+- **Doctype & Documentation Comments**: Every component, public class, method, and state provider must be documented with comprehensive Dart doc comments (`///`) detailing purpose, input contracts, and layer roles.
+- **Current Status**: All source files in the repository adhere strictly to the <= 300 LOC target.
+
+---
+
+## 6. Strict Design Token Consistency & Zero Hardcoded Colors
+
+- **Zero Hardcoded Colors**: Constructing colors directly with `Color(0x...)` or random hex literals is strictly prohibited across UI widgets, modals, views, and custom painters.
+- **Single Source of Truth**: All palette shades, backgrounds, text colors, borders, shadows, and radii must reference `AppTokens`, `AppPalette.of(context)`, or `Theme.of(context)`.
+- **Theme Integrity**: Consistent light, dark, and high-contrast behavior must be preserved without visual fragmentation. Always inspect components across all supported themes.

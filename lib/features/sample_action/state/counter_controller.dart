@@ -21,9 +21,34 @@ class CounterState {
   }
 }
 
-/// StateNotifier managing sample action interactions.
-class CounterController extends StateNotifier<CounterState> {
-  CounterController() : super(CounterState());
+/// Notifier managing sample action interactions.
+class CounterController extends Notifier<CounterState> {
+  CounterState? _standaloneState;
+
+  @override
+  CounterState build() {
+    final initial = CounterState();
+    _standaloneState = initial;
+    return initial;
+  }
+
+  @override
+  CounterState get state {
+    try {
+      return super.state;
+    } catch (_) {
+      return _standaloneState ??= CounterState();
+    }
+  }
+
+  @override
+  set state(CounterState value) {
+    try {
+      super.state = value;
+    } catch (_) {
+      _standaloneState = value;
+    }
+  }
 
   void increment() {
     state = state.copyWith(
@@ -48,6 +73,4 @@ class CounterController extends StateNotifier<CounterState> {
 
 /// Provider for CounterController.
 final counterProvider =
-    StateNotifierProvider<CounterController, CounterState>((ref) {
-  return CounterController();
-});
+    NotifierProvider<CounterController, CounterState>(CounterController.new);

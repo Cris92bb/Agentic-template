@@ -48,6 +48,7 @@ Smartwatches present unique constraints:
 - **Fit the safe area**: Glanceable content should scale down (e.g. `FittedBox(fit: BoxFit.scaleDown)`) rather than overflow on small faces.
 - **Gesture Conflict Resolution**: Smartwatch OSes use horizontal edge-swipes to dismiss applications. Prefer vertical scrolling, or custom `ScrollPhysics` that only allow one horizontal direction.
 - **Glanceable Hierarchy**: Display large typography, concise counters, high contrast, and large touch zones.
+- **OLED Black Splash Screen & Circular Icon**: Smartwatch builds should configure the splash screen window background to pure `#000000` black (`values-watch/` and `values-watch-v31/`) to blend into circular bezels during process startup, and provide a round launcher icon (`android:roundIcon`).
 - **Publishing**: the watch layout runs inside the Android app, but a Wear OS release needs a watch-specific manifest (`uses-feature android.hardware.type.watch`, standalone meta-data), typically as a separate build flavor.
 
 ---
